@@ -6242,6 +6242,64 @@ void PrintOutlineTree(PTBookmark *item)
     }
 }
 
+// Builds an outline tree as an array of mutable dictionaries
+NSMutableArray<NSMutableDictionary*> * BuildOutlineTree(PTBookmark *item) {
+    NSMutableArray<NSMutableDictionary*> *outline = [[NSMutableArray alloc] init];
+
+    for (; [item IsValid]; item=[item GetNext]) {
+        NSMutableDictionary *bookmarkDict = [[NSMutableDictionary alloc] init];
+        int indent = [item GetIndent] - 1;
+        [bookmarkDict setObject:@(indent) forKey:@"indent"];
+
+        [bookmarkDict setObject:[NSString stringWithFormat:@"%@", [item GetTitle]] forKey:@"title"];
+
+        // Set Action
+        PTAction *action = [item GetAction];
+        if ([action IsValid]) {
+            if ([action GetType] == e_ptGoTo) {
+                PTDestination *dest = [action GetDest];
+                if ([dest IsValid]) {
+                    PTPage *page = [dest GetPage];
+                    [bookmarkDict setObject:@([page GetIndex]) forKey:@"page"];
+                }
+            } else {
+                [bookmarkDict setObject:@"NULL" forKey:@"page"];
+            }
+        } else {
+            [bookmarkDict setObject:@"NULL" forKey:@"page"];
+        }
+
+        if ([item HasChildren]) { // Recursively build children sub-trees
+            [bookmarkDict setObject:BuildOutlineTree([item GetFirstChild]) forKey:@"children"];
+        }
+
+        [outline addObject:bookmarkDict];
+    }
+
+    return outline;
+}
+
+- (void)getOutlineList
+{
+    PTPDFDoc * doc = [self.currentDocumentViewController.pdfViewCtrl GetDoc];
+    PTBookmark *root = [doc GetFirstBookmark];
+    NSMutableArray<NSMutableDictionary*> *outline = BuildOutlineTree(root);
+
+    NSError *error;
+    NSData *jsonData = [NSJSONSerialization dataWithJSONObject:outline
+                                                       options:NSJSONWritingPrettyPrinted
+                                                         error:&error];
+    if (!jsonData) {
+        NSLog(@"Error creating JSON data: %@", error);
+        return;
+    }
+
+    NSString *jsonString = [[NSString alloc] initWithData:jsonData encoding:NSUTF8StringEncoding];
+    NSLog(@"%@", jsonString);
+
+    return;
+}
+
 -(void)openOutlineList
 {
     if (!self.currentDocumentViewController.outlineListHidden) {
@@ -6249,15 +6307,6 @@ void PrintOutlineTree(PTBookmark *item)
         navigationListsViewController.selectedViewController = navigationListsViewController.outlineViewController;
         [self.currentDocumentViewController presentViewController:navigationListsViewController animated:YES completion:nil];
     }
-}
-
-- (void)getOutlineList
-{
-    PTPDFDoc * doc = [self.currentDocumentViewController.pdfViewCtrl GetDoc];
-    PTBookmark *root = [doc GetFirstBookmark];
-    PrintOutlineTree(root);
-
-    return;
 }
 
 #pragma mark - Layers
