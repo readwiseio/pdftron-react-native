@@ -6197,51 +6197,6 @@ NS_ASSUME_NONNULL_END
 
 #pragma mark - Outline
 
-
-void PrintIndent(PTBookmark *item)
-{
-    int ident = [item GetIndent] - 1;
-    int i=0;
-    for (int i=0; i<ident; ++i) printf(" ");
-}
-
-// Prints out the outline tree to the standard output
-void PrintOutlineTree(PTBookmark *item)
-{
-    for (; [item IsValid]; item=[item GetNext])
-    {
-        PrintIndent(item);
-        if ([item IsOpen]) {
-            printf("- %s ACTION => ", [[item GetTitle] UTF8String]);
-        }
-        else {
-            printf("+ %s ACTION => ", [[item GetTitle] UTF8String]);
-        }
-
-        // Print Action
-        PTAction *action = [item GetAction];
-        if ([action IsValid]) {
-            if ([action GetType] == e_ptGoTo) {
-                PTDestination *dest = [action GetDest];
-                if ([dest IsValid]) {
-                    PTPage *page = [dest GetPage];
-                    printf("GoTo Page #%d\n", [page GetIndex]);
-                }
-            }
-            else {
-                puts("Not a 'GoTo' action");
-            }
-        } else {
-            puts("NULL");
-        }
-
-        if ([item HasChildren]) // Recursively print children sub-trees
-        {
-            PrintOutlineTree([item GetFirstChild]);
-        }
-    }
-}
-
 // Builds an outline tree as an array of mutable dictionaries
 NSMutableArray<NSMutableDictionary*> * BuildOutlineTree(PTBookmark *item) {
     NSMutableArray<NSMutableDictionary*> *outline = [[NSMutableArray alloc] init];
@@ -6279,8 +6234,7 @@ NSMutableArray<NSMutableDictionary*> * BuildOutlineTree(PTBookmark *item) {
     return outline;
 }
 
-- (void)getOutlineList
-{
+- (NSString *) getOutlineList {
     PTPDFDoc * doc = [self.currentDocumentViewController.pdfViewCtrl GetDoc];
     PTBookmark *root = [doc GetFirstBookmark];
     NSMutableArray<NSMutableDictionary*> *outline = BuildOutlineTree(root);
@@ -6291,13 +6245,12 @@ NSMutableArray<NSMutableDictionary*> * BuildOutlineTree(PTBookmark *item) {
                                                          error:&error];
     if (!jsonData) {
         NSLog(@"Error creating JSON data: %@", error);
-        return;
     }
 
     NSString *jsonString = [[NSString alloc] initWithData:jsonData encoding:NSUTF8StringEncoding];
     NSLog(@"%@", jsonString);
 
-    return;
+    return outline;
 }
 
 -(void)openOutlineList

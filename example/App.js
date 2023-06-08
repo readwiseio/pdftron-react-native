@@ -41,7 +41,13 @@ export default class App extends Component<Props> {
   };
 
   onDocumentLoaded = () => {
-    this._viewer.getOutlineList();
+    // const outline1 = this._viewer.getOutlineList();
+
+    // console.log('=> outline 1', outline1);
+
+    this._viewer
+      .getOutlineList()
+      .then(outline => console.log('=> outline 2', outline));
   };
 
   render() {

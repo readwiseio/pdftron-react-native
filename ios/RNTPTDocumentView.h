@@ -563,6 +563,8 @@ static NSString * const PTSignaturesManager_signatureDirectory = @"PTSignaturesM
 
 - (NSString *)getDocumentPath;
 
+- (NSString *)getOutlineList;
+
 - (NSMutableArray<NSDictionary *> *)getAllFieldsForDocumentViewTag:(int)pageNumber;
 
 - (NSString *)exportAsImage:(int)pageNumber dpi:(int)dpi exportFormat:(NSString*)exportFormat transparent:(BOOL)transparent;
@@ -711,8 +713,6 @@ static NSString * const PTSignaturesManager_signatureDirectory = @"PTSignaturesM
 - (void)setCurrentToolbar:(NSString *)toolbarTitle;
 
 - (void)openOutlineList;
-
-- (void)getOutlineList;
 
 - (void)openLayersList;
 

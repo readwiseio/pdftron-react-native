@@ -1338,8 +1338,8 @@ RCT_REMAP_METHOD(getOutlineList,
                  rejecter:(RCTPromiseRejectBlock)reject)
 {
     @try {
-        [[self documentViewManager] getOutlineListForDocumentViewTag:tag];
-        resolve(nil);
+         NSString *outline = [[self documentViewManager] getOutlineListForDocumentViewTag:tag];
+        resolve(outline);
     }
     @catch (NSException *exception) {
         reject(@"get_outline_list_failed", @"Failed to get outline list", [self errorFromException:exception]);
