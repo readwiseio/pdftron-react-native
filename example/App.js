@@ -19,10 +19,6 @@ type Props = {};
 export default class App extends Component<Props> {
   constructor(props) {
     super(props);
-
-    RNPdftron.initialize(
-      'Readwise Inc. (readwise.io):OEM:Readwise Reader::IA:AMS(20231208):7377E4301FF78AD02333FD7860610FBBC9300A35BD12ECC2876440A642B231F5C7',
-    );
     RNPdftron.enableJavaScript(true);
   }
 
