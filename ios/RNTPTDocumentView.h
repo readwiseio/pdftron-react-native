@@ -712,6 +712,8 @@ static NSString * const PTSignaturesManager_signatureDirectory = @"PTSignaturesM
 
 - (void)openOutlineList;
 
+- (void)getOutlineList;
+
 - (void)openLayersList;
 
 - (void)openNavigationLists;

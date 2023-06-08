@@ -754,7 +754,7 @@ RCT_REMAP_METHOD(getZoom,
         reject(@"get_zoom", @"Failed to get zoom", [self errorFromException:exception]);
     }
 }
-                 
+
 RCT_REMAP_METHOD(setZoomLimits,
                  setZoomLimitsForDocumentViewTag:(nonnull NSNumber *)tag
                  zoomLimitMode:(NSString *)zoomLimitMode
@@ -1329,6 +1329,20 @@ RCT_REMAP_METHOD(openOutlineList,
     }
     @catch (NSException *exception) {
         reject(@"open_outline_list_failed", @"Failed to open outline list", [self errorFromException:exception]);
+    }
+}
+
+RCT_REMAP_METHOD(getOutlineList,
+                 getOutlineListForDocumentViewTag: (nonnull NSNumber *)tag
+                 resolver:(RCTPromiseResolveBlock)resolve
+                 rejecter:(RCTPromiseRejectBlock)reject)
+{
+    @try {
+        [[self documentViewManager] getOutlineListForDocumentViewTag:tag];
+        resolve(nil);
+    }
+    @catch (NSException *exception) {
+        reject(@"get_outline_list_failed", @"Failed to get outline list", [self errorFromException:exception]);
     }
 }
 

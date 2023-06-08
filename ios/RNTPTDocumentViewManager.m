@@ -915,7 +915,7 @@ RCT_CUSTOM_VIEW_PROPERTY(signatureColors, NSArray, RNTPTDocumentView)
                 @"error": @"Bookmark cannot be exported"
             });
         }
-        
+
     }
 }
 
@@ -975,10 +975,10 @@ RCT_CUSTOM_VIEW_PROPERTY(signatureColors, NSArray, RNTPTDocumentView)
             @"onTextSearchResult": @"onTextSearchResult",
             @"found": [NSNumber numberWithBool:found]
         }];
-        
+
         // set potential nil value through this way
         result[@"textSelection"] = textSelection;
-        
+
         sender.onChange(result);
     }
 }
@@ -990,7 +990,7 @@ RCT_CUSTOM_VIEW_PROPERTY(signatureColors, NSArray, RNTPTDocumentView)
             @"onAnnotationToolbarItemPress": @"onAnnotationToolbarItemPress",
             PTAnnotationToolbarItemKeyId: (itemKey ?: @"")
         }];
-                
+
         sender.onChange(result);
     }
 }
@@ -1061,7 +1061,7 @@ RCT_CUSTOM_VIEW_PROPERTY(signatureColors, NSArray, RNTPTDocumentView)
         return nil;
     }
 }
- 
+
 - (NSString *)exportAsImageForDocumentViewTag:(NSNumber *)tag pageNumber:(int)pageNumber dpi:(int)dpi exportFormat:(NSString*)exportFormat transparent:(BOOL)transparent
 {
     RNTPTDocumentView *documentView = self.documentViews[tag];
@@ -1092,7 +1092,7 @@ RCT_CUSTOM_VIEW_PROPERTY(signatureColors, NSArray, RNTPTDocumentView)
     } else {
         @throw [NSException exceptionWithName:NSInvalidArgumentException reason:@"Unable to find DocumentView for tag" userInfo:nil];
     }
-    
+
 }
 
 -(void)openBookmarkListForDocumentViewTag:(NSNumber *)tag
@@ -1608,7 +1608,7 @@ RCT_CUSTOM_VIEW_PROPERTY(signatureColors, NSArray, RNTPTDocumentView)
     }
 
 }
-        
+
 - (void)setCurrentToolbarForDocumentViewTag:(NSNumber *)tag toolbarTitle:(NSString *)toolbarTitle
 {
     RNTPTDocumentView *documentView = self.documentViews[tag];
@@ -1644,6 +1644,16 @@ RCT_CUSTOM_VIEW_PROPERTY(signatureColors, NSArray, RNTPTDocumentView)
     RNTPTDocumentView *documentView = self.documentViews[tag];
     if (documentView) {
         [documentView openOutlineList];
+    } else {
+        @throw [NSException exceptionWithName:NSInvalidArgumentException reason:@"Unable to find DocumentView for tag" userInfo:nil];
+    }
+}
+
+-(void)getOutlineListForDocumentViewTag:(NSNumber *)tag
+{
+    RNTPTDocumentView *documentView = self.documentViews[tag];
+    if (documentView) {
+        [documentView getOutlineList];
     } else {
         @throw [NSException exceptionWithName:NSInvalidArgumentException reason:@"Unable to find DocumentView for tag" userInfo:nil];
     }
@@ -1826,7 +1836,7 @@ RCT_CUSTOM_VIEW_PROPERTY(signatureColors, NSArray, RNTPTDocumentView)
         @throw [NSException exceptionWithName:NSInvalidArgumentException reason:@"Unable to find DocumentView for tag" userInfo:nil];
     }
 }
-        
+
 - (void)setColorPostProcessColorsForDocumentViewTag:(NSNumber *)tag whiteColor:(NSDictionary *)whiteColor blackColor:(NSDictionary *)blackColor
 {
     RNTPTDocumentView *documentView = self.documentViews[tag];
