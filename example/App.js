@@ -38,7 +38,7 @@ export default class App extends Component<Props> {
 
   onDocumentLoaded = () => {
     this._viewer.getOutlineList().then(outline => {
-      console.log('=> outline', outline);
+      console.log('=> outline', JSON.stringify(outline, null, 2));
     });
   };
 
