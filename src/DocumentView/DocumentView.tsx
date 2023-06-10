@@ -14,8 +14,9 @@ import * as AnnotOptions from "../AnnotOptions/AnnotOptions";
 
 export interface OutlineItem {
   indent: number;
-  page?: number;
   title: string;
+  page?: number;
+  children?: OutlineItem[];
 }
 
 /**
