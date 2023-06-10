@@ -12,6 +12,12 @@ const { DocumentViewManager } = NativeModules;
 import { Config } from "../Config/Config";
 import * as AnnotOptions from "../AnnotOptions/AnnotOptions";
 
+interface OutlineItem {
+  indent: number;
+  page?: number;
+  title: string;
+}
+
 /**
  * Object containing PropTypes types for {@link DocumentView} class.
  * Also used to generate prop types for TS users.
@@ -1217,7 +1223,7 @@ export class DocumentView extends PureComponent<DocumentViewProps, any> {
     return Promise.resolve();
   }
 
-  getOutlineList = (): Promise<void | string> => {
+  getOutlineList = (): Promise<void | OutlineItem[]> => {
     const tag = findNodeHandle(this._viewerRef);
     if (tag != null) {
       return DocumentViewManager.getOutlineList(tag);
