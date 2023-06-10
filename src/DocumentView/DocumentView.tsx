@@ -12,7 +12,7 @@ const { DocumentViewManager } = NativeModules;
 import { Config } from "../Config/Config";
 import * as AnnotOptions from "../AnnotOptions/AnnotOptions";
 
-interface OutlineItem {
+export interface OutlineItem {
   indent: number;
   page?: number;
   title: string;
