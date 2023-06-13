@@ -1,5 +1,7 @@
 package com.pdftron.reactnative.views;
 
+import com.google.gson.Gson;
+
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
@@ -42,7 +44,9 @@ import com.pdftron.fdf.FDFDoc;
 import com.pdftron.pdf.Action;
 import com.pdftron.pdf.ActionParameter;
 import com.pdftron.pdf.Annot;
+import com.pdftron.pdf.Bookmark;
 import com.pdftron.pdf.ColorPt;
+import com.pdftron.pdf.Destination;
 import com.pdftron.pdf.DigitalSignatureField;
 import com.pdftron.pdf.Element;
 import com.pdftron.pdf.ElementBuilder;
@@ -4834,6 +4838,96 @@ public class DocumentView extends com.pdftron.pdf.controls.DocumentView2 {
                 mPdfViewCtrlTabHostFragment.onOutlineOptionSelected(0);
             }
         }
+    }
+
+    // Builds an outline tree as an array of HashMaps
+    ArrayList<HashMap<String, Object>> buildOutlineTree(Bookmark item) {
+        ArrayList<HashMap<String, Object>> outline = new ArrayList<>();
+
+        try {
+            while (item.isValid()) {
+                HashMap<String, Object> bookmarkDict = new HashMap<>();
+                int indent = item.getIndent() - 1;
+                bookmarkDict.put("indent", indent);
+                bookmarkDict.put("title", String.valueOf(item.getTitle()));
+
+                // Set Action
+                Action action = item.getAction();
+                if (action.isValid()) {
+                    if (action.getType() == Action.e_GoTo) {
+                        Destination dest = action.getDest();
+                        if (dest.isValid()) {
+                            Page page = dest.getPage();
+                            bookmarkDict.put("page", page.getIndex());
+                        } else {
+                            bookmarkDict.put("page", "NULL");
+                        }
+                    } else {
+                        bookmarkDict.put("page", "NULL");
+                    }
+                } else {
+                    bookmarkDict.put("page", "NULL");
+                }
+
+                // Recursively build children sub-trees
+                if (item.hasChildren()) {
+                    bookmarkDict.put("children", buildOutlineTree(item.getFirstChild()));
+                }
+
+                outline.add(bookmarkDict);
+
+                item = item.getNext();
+            }
+        } catch (PDFNetException e) {
+            e.printStackTrace();
+        }
+
+        return outline;
+    }
+
+    private WritableArray convertToWritableArray(ArrayList<HashMap<String, Object>> list) {
+        WritableArray writableArray = Arguments.createArray();
+
+        for (HashMap<String, Object> map : list) {
+            WritableMap writableMap = Arguments.createMap();
+
+            for (String key : map.keySet()) {
+            Object value = map.get(key);
+            if (value instanceof String) {
+                writableMap.putString(key, (String) value);
+            } else if (value instanceof Integer) {
+                writableMap.putInt(key, (Integer) value);
+            } else if (value instanceof Boolean) {
+                writableMap.putBoolean(key, (Boolean) value);
+            } else if (value instanceof Double) {
+                writableMap.putDouble(key, (Double) value);
+            } else if (value instanceof ArrayList) {
+                writableMap.putArray(key, convertToWritableArray((ArrayList<HashMap<String, Object>>) value));
+            } // Add other types as per your requirement
+            }
+
+            writableArray.pushMap(writableMap);
+        }
+
+        return writableArray;
+    }
+
+    public WritableArray getOutlineList() {
+        try {
+            PDFViewCtrl pdfViewCtrl = getPdfViewCtrl();
+            PDFDoc pdfDoc = pdfViewCtrl.getDoc();
+            Bookmark root = pdfDoc.getFirstBookmark();
+            ArrayList<HashMap<String, Object>> outlineTree = buildOutlineTree(root);
+            WritableArray outlineArray = convertToWritableArray(outlineTree);
+            return outlineArray;
+            // Gson gson = new Gson();
+            // String json = gson.toJson(outline);
+            // return json;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return null;
     }
 
     public void openLayersList() {

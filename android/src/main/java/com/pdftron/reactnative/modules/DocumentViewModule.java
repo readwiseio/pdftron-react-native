@@ -155,6 +155,21 @@ public class DocumentViewModule extends ReactContextBaseJavaModule implements Ac
     }
 
     @ReactMethod
+    public void getOutlineList(final int tag, final Promise promise) {
+        getReactApplicationContext().runOnUiQueueThread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    WritableArray outline = mDocumentViewInstance.getOutlineList(tag);
+                    promise.resolve(outline);
+                } catch (Exception e) {
+                    promise.reject(e);
+                }
+            }
+        });
+    }
+
+    @ReactMethod
     public void getAllFields(final int tag, final int pageNumber, final Promise promise) {
         getReactApplicationContext().runOnUiQueueThread(new Runnable() {
             @Override
