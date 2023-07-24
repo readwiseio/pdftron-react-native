@@ -3250,6 +3250,50 @@ NS_ASSUME_NONNULL_END
     }
 }
 
+- (NSString *) getBase64FromPageRect:(int)pageNumber rect:(NSDictionary *)rect {
+    PTPDFDoc * doc = [self.currentDocumentViewController.pdfViewCtrl GetDoc];
+    PTPage *page = [doc GetPage: pageNumber];
+    PTPDFDraw *draw = [[PTPDFDraw alloc] initWithDpi: 92];
+
+    NSNumber *rectX1 = [RNTPTDocumentView PT_idAsNSNumber:rect[PTRectX1Key]];
+    NSNumber *rectY1 = [RNTPTDocumentView PT_idAsNSNumber:rect[PTRectY1Key]];
+    NSNumber *rectX2 = [RNTPTDocumentView PT_idAsNSNumber:rect[PTRectX2Key]];
+    NSNumber *rectY2 = [RNTPTDocumentView PT_idAsNSNumber:rect[PTRectY2Key]];
+
+    PTPDFRect *zoom_rect = [[PTPDFRect alloc] initWithX1: [rectX1 doubleValue] y1: [rectY1 doubleValue] x2: [rectX2 doubleValue] y2: [rectY2 doubleValue]];
+    [page SetCropBox: zoom_rect]; // Set the page crop box.
+
+    // Select the crop region to be used for drawing.
+    [draw SetPageBox: e_ptcrop];
+    [draw SetDPI: 900];  // Set the output image resolution to 900 DPI.
+
+    // Get the path to the documents directory
+    NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
+    NSString *documentsDirectory = [paths objectAtIndex:0];
+
+    NSString *imagePath = [documentsDirectory stringByAppendingPathComponent:@"rectImage.png"];
+
+    [draw Export:page filename: imagePath format: @"PNG"];
+
+    // Load the image into a NSData object
+    NSData *imageData = [NSData dataWithContentsOfFile:imagePath];
+
+    // Convert the NSData object to a Base64 string
+    NSString *base64ImageString = [imageData base64EncodedStringWithOptions:0];
+
+    // Delete image
+    NSFileManager *fileManager = [NSFileManager defaultManager];
+    NSError *error;
+    BOOL success = [fileManager removeItemAtPath:imagePath error:&error];
+
+    if (!success || error) {
+        // Something went wrong with the deletion
+        NSLog(@"Error deleting file: %@", error);
+    }
+
+    return base64ImageString;
+}
+
 - (void)smartZoom:(int)x y:(int)y animated:(BOOL)animated
 {
     PTDocumentBaseViewController *documentViewController = self.currentDocumentViewController;

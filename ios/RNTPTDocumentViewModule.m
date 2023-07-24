@@ -805,6 +805,22 @@ RCT_REMAP_METHOD(zoomToRect,
     }
 }
 
+RCT_REMAP_METHOD(getBase64FromPageRect,
+                 getBase64FromPageRectForDocumentViewTag:(nonnull NSNumber *)tag
+                 pageNumber:(int)pageNumber
+                 rect:(NSDictionary *)rect
+                 resolver:(RCTPromiseResolveBlock)resolve
+                 rejecter:(RCTPromiseRejectBlock)reject)
+{
+    @try {
+         NSString *outline = [[self documentViewManager] getBase64FromPageRectForDocumentViewTag:tag pageNumber:pageNumber rect:rect];
+        resolve(outline);
+    }
+    @catch (NSException *exception) {
+        reject(@"get_base_64_from_page_rect_failed", @"Failed to get base64 from page rect", [self errorFromException:exception]);
+    }
+}
+
 RCT_REMAP_METHOD(smartZoom,
                  smartZoomForDocumentViewTag:(nonnull NSNumber *)tag
                  x:(int)x

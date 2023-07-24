@@ -1660,6 +1660,17 @@ RCT_CUSTOM_VIEW_PROPERTY(signatureColors, NSArray, RNTPTDocumentView)
     }
 }
 
+- (NSString *)getBase64FromPageRectForDocumentViewTag:(nonnull NSNumber *)tag pageNumber:(int)pageNumber rect:(NSDictionary *)rect
+{
+    RNTPTDocumentView *documentView = self.documentViews[tag];
+    if (documentView) {
+        return [documentView getBase64FromPageRect:pageNumber rect:rect];
+    } else {
+        @throw [NSException exceptionWithName:NSInvalidArgumentException reason:@"Unable to find DocumentView for tag" userInfo:nil];
+        return nil;
+    }
+}
+
 - (void)openAnnotationListForDocumentViewTag:(NSNumber *)tag
 {
     RNTPTDocumentView *documentView = self.documentViews[tag];

@@ -652,6 +652,8 @@ static NSString * const PTSignaturesManager_signatureDirectory = @"PTSignaturesM
 
 - (void)zoomToRect:(int)pageNumber rect:(NSDictionary *)rect;
 
+- (NSString *)getBase64FromPageRect:(int)pageNumber rect:(NSDictionary *)rect;
+
 - (void)smartZoom:(int)x y:(int)y animated:(BOOL)animated;
 
 - (NSDictionary<NSString *, NSNumber *> *)getScrollPos;

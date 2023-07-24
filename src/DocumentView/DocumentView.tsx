@@ -1232,6 +1232,14 @@ export class DocumentView extends PureComponent<DocumentViewProps, any> {
     return Promise.resolve();
   };
 
+  getBase64FromPageRect = (pageNumber: number, rect: AnnotOptions.Rect): Promise<void | string[]> => {
+    const tag = findNodeHandle(this._viewerRef);
+    if (tag != null) {
+      return DocumentViewManager.getBase64FromPageRect(tag, pageNumber, rect);
+    }
+    return Promise.resolve();
+  };
+
   openLayersList = (): Promise<void> => {
     const tag = findNodeHandle(this._viewerRef);
     if (tag != null) {
