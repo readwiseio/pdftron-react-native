@@ -3255,16 +3255,19 @@ NS_ASSUME_NONNULL_END
     PTPage *page = [doc GetPage: pageNumber];
     PTPDFDraw *draw = [[PTPDFDraw alloc] initWithDpi: 92];
 
+    PTPDFRect *originalUserCrop = [page GetBox:e_ptuser_crop];
+
     NSNumber *rectX1 = [RNTPTDocumentView PT_idAsNSNumber:rect[PTRectX1Key]];
     NSNumber *rectY1 = [RNTPTDocumentView PT_idAsNSNumber:rect[PTRectY1Key]];
     NSNumber *rectX2 = [RNTPTDocumentView PT_idAsNSNumber:rect[PTRectX2Key]];
     NSNumber *rectY2 = [RNTPTDocumentView PT_idAsNSNumber:rect[PTRectY2Key]];
-
     PTPDFRect *zoom_rect = [[PTPDFRect alloc] initWithX1: [rectX1 doubleValue] y1: [rectY1 doubleValue] x2: [rectX2 doubleValue] y2: [rectY2 doubleValue]];
-    [page SetCropBox: zoom_rect]; // Set the page crop box.
+
+    // Set the user crop box.
+    [page SetBox:e_ptuser_crop box:zoom_rect];
 
     // Select the crop region to be used for drawing.
-    [draw SetPageBox: e_ptcrop];
+    [draw SetPageBox: e_ptuser_crop];
     [draw SetDPI: 900];  // Set the output image resolution to 900 DPI.
 
     // Get the path to the documents directory
@@ -3274,6 +3277,9 @@ NS_ASSUME_NONNULL_END
     NSString *imagePath = [documentsDirectory stringByAppendingPathComponent:@"rectImage.png"];
 
     [draw Export:page filename: imagePath format: @"PNG"];
+
+    // Reset user crop box
+    [page SetBox:e_ptuser_crop box:originalUserCrop];
 
     // Load the image into a NSData object
     NSData *imageData = [NSData dataWithContentsOfFile:imagePath];

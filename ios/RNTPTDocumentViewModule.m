@@ -813,8 +813,8 @@ RCT_REMAP_METHOD(getBase64FromPageRect,
                  rejecter:(RCTPromiseRejectBlock)reject)
 {
     @try {
-         NSString *outline = [[self documentViewManager] getBase64FromPageRectForDocumentViewTag:tag pageNumber:pageNumber rect:rect];
-        resolve(outline);
+         NSString *base64ImageFromRect = [[self documentViewManager] getBase64FromPageRectForDocumentViewTag:tag pageNumber:pageNumber rect:rect];
+        resolve(base64ImageFromRect);
     }
     @catch (NSException *exception) {
         reject(@"get_base_64_from_page_rect_failed", @"Failed to get base64 from page rect", [self errorFromException:exception]);
