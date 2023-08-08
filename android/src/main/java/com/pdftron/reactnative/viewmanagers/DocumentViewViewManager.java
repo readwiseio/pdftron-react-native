@@ -996,6 +996,15 @@ public class DocumentViewViewManager extends ViewGroupManager<DocumentView> {
         }
     }
 
+    public String getBase64FromPageRect(int tag, int pageNumber, ReadableMap rect) throws PDFNetException {
+        DocumentView documentView = mDocumentViews.get(tag);
+        if (documentView != null) {
+            return documentView.getBase64FromPageRect(pageNumber, rect);
+        } else {
+            throw new PDFNetException("", 0L, getName(), "getBase64FromPageRect", "Unable to find DocumentView.");
+        }
+    }
+
     public void smartZoom(int tag, int x, int y, boolean animated) throws PDFNetException {
         DocumentView documentView = mDocumentViews.get(tag);
         if (documentView != null) {

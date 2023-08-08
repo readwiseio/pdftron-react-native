@@ -784,6 +784,21 @@ public class DocumentViewModule extends ReactContextBaseJavaModule implements Ac
     }
 
     @ReactMethod
+    public void getBase64FromPageRect(final int tag, final int pageNumber, final ReadableMap rect, final Promise promise) {
+        getReactApplicationContext().runOnUiQueueThread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    String base64Rect = mDocumentViewInstance.getBase64FromPageRect(tag, pageNumber, rect);
+                    promise.resolve(base64Rect);
+                } catch (Exception ex) {
+                    promise.reject(ex);
+                }
+            }
+        });
+    }
+
+    @ReactMethod
     public void smartZoom(final int tag, final int x, final int y, final boolean animated, final Promise promise) {
         getReactApplicationContext().runOnUiQueueThread(new Runnable() {
             @Override

@@ -23,6 +23,13 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.util.Base64;
+
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import android.util.Log;
 import com.facebook.react.bridge.Arguments;
 import com.facebook.react.bridge.Promise;
 import com.facebook.react.bridge.ReactContext;
@@ -39,6 +46,7 @@ import com.pdftron.collab.ui.viewer.CollabManager;
 import com.pdftron.collab.ui.viewer.CollabViewerBuilder2;
 import com.pdftron.collab.ui.viewer.CollabViewerTabHostFragment2;
 import com.pdftron.collab.utils.Keys;
+import com.pdftron.pdf.PDFDraw;
 import com.pdftron.common.PDFNetException;
 import com.pdftron.fdf.FDFDoc;
 import com.pdftron.pdf.Action;
@@ -1066,6 +1074,70 @@ public class DocumentView extends com.pdftron.pdf.controls.DocumentView2 {
                 ex.printStackTrace();
             }
         }
+    }
+
+    public String encodeImageToBase64(String imagePath) {
+        // Step 1: Read the image into a Bitmap object
+        File imgFile = new File(imagePath);
+        if (imgFile.exists() && imgFile.canRead()) {
+            Bitmap bitmap = BitmapFactory.decodeFile(imgFile.getAbsolutePath());
+
+            // Step 2: Convert the Bitmap to a byte array
+            ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+            bitmap.compress(Bitmap.CompressFormat.PNG, 100, byteArrayOutputStream);
+            byte[] byteArray = byteArrayOutputStream.toByteArray();
+
+            // Step 3: Encode the byte array to Base64
+            String encoded = Base64.encodeToString(byteArray, Base64.DEFAULT);
+
+            return encoded;
+        } else {
+            // Handle error, file doesn't exist or can't be read
+            return null;
+        }
+    }
+
+    public String getBase64FromPageRect(int pageNumber, ReadableMap rectMap) {
+        if (getPdfViewCtrl() != null) {
+            try {
+                if (rectMap != null && rectMap.hasKey(KEY_X1) && rectMap.hasKey(KEY_Y1) &&
+                        rectMap.hasKey(KEY_X2) && rectMap.hasKey(KEY_Y2)) {
+                    double rectX1 = rectMap.getDouble(KEY_X1);
+                    double rectY1 = rectMap.getDouble(KEY_Y1);
+                    double rectX2 = rectMap.getDouble(KEY_X2);
+                    double rectY2 = rectMap.getDouble(KEY_Y2);
+                    com.pdftron.pdf.Rect rect = new com.pdftron.pdf.Rect(rectX1, rectY1, rectX2, rectY2);
+
+                    Page page = getPdfViewCtrl().getDoc().getPage(pageNumber);
+
+                    com.pdftron.pdf.Rect originalUserCrop = page.getBox(Page.e_crop);
+
+                    // Set the page crop box.
+                    page.setCropBox(rect);
+
+                    PDFDraw draw = new PDFDraw();
+                    // Select the crop region to be used for drawing.
+                    draw.setPageBox(Page.e_crop);
+                    // Set the output image resolution to 900 DPI.
+                    draw.setDPI(900);
+
+                    File root = android.os.Environment.getExternalStorageDirectory();
+                    String imagePath = root.getAbsolutePath() + "/download/PDF_snapshot.png";
+                    draw.export(page, imagePath, "PNG");
+                    File imgFile = new File(imagePath);
+                    String base64Image = encodeImageToBase64(imagePath);
+                    imgFile.delete();
+
+                    page.setBox(Page.e_crop, originalUserCrop);
+
+                    return base64Image;
+                }
+            } catch (PDFNetException ex) {
+                ex.printStackTrace();
+            }
+        }
+
+        return "";
     }
 
     public void smartZoom(int x, int y, boolean animated) {
