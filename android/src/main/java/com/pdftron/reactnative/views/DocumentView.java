@@ -3449,9 +3449,12 @@ public class DocumentView extends com.pdftron.pdf.controls.DocumentView2 {
                     if (annotObj != null) {
                         WritableMap annotPair = Arguments.createMap();
                         Annot annot = new Annot(annotObj);
-                        String annotId = annot.getUniqueID().getAsPDFText();
+                        Obj objAnnotUID = annot.getUniqueID();
+                        if(objAnnotUID != null) {
+                            String annotId = objAnnotUID.getAsPDFText();
+                            annotPair.putString(KEY_ANNOTATION_ID, annotId);
+                        }
                         Integer page = safeGetObjAsInteger(annotObj, Keys.FDF_PAGE) + 1;
-                        annotPair.putString(KEY_ANNOTATION_ID, annotId);
                         annotPair.putInt(KEY_ANNOTATION_PAGE, page);
                         annotations.pushMap(annotPair);
                     }
