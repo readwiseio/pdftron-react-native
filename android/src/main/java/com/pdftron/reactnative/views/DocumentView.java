@@ -129,6 +129,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import static com.pdftron.reactnative.utils.Constants.*;
@@ -5125,6 +5126,45 @@ public class DocumentView extends com.pdftron.pdf.controls.DocumentView2 {
         }
 
         return null;
+    }
+
+    public void getOutlineList(Promise promise) {
+        try {
+            CompletableFuture<WritableArray> future = null;
+            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
+                future = CompletableFuture.supplyAsync(() -> {
+                    try {
+                        PDFViewCtrl pdfViewCtrl = getPdfViewCtrl();
+                        pdfViewCtrl.docLockRead();
+                        try {
+                            PDFDoc pdfDoc = pdfViewCtrl.getDoc();
+                            Bookmark root = pdfDoc.getFirstBookmark();
+                            ArrayList<HashMap<String, Object>> outlineTree = buildOutlineTree(root);
+                            WritableArray outlineArray = convertToWritableArray(outlineTree);
+
+                            return outlineArray;
+                        } finally {
+                            pdfViewCtrl.docUnlockRead();
+                        }
+                    } catch (PDFNetException e) {
+                        throw new RuntimeException(e);
+                    }
+                });
+                future.thenAccept(result -> {
+                            System.out.print(result);
+                            promise.resolve(result);
+                        })
+                        .exceptionally(e -> {
+                            System.out.println("Error: " + e.getMessage());
+                            promise.reject("Error:", e.getMessage());
+                            return null;
+                });
+            } else {
+                promise.reject("Error: getOutlineList is not supported on Android below N", "getOutlineList is not supported on Android below N")
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     public void openLayersList() {
