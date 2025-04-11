@@ -5112,6 +5112,7 @@ public class DocumentView extends com.pdftron.pdf.controls.DocumentView2 {
     public WritableArray getOutlineList() {
         try {
             PDFViewCtrl pdfViewCtrl = getPdfViewCtrl();
+            pdfViewCtrl.docLockRead();
             PDFDoc pdfDoc = pdfViewCtrl.getDoc();
             Bookmark root = pdfDoc.getFirstBookmark();
             ArrayList<HashMap<String, Object>> outlineTree = buildOutlineTree(root);
@@ -5122,6 +5123,8 @@ public class DocumentView extends com.pdftron.pdf.controls.DocumentView2 {
             // return json;
         } catch (Exception e) {
             e.printStackTrace();
+        } finally {
+            pdfViewCtrl.docUnlockRead();
         }
 
         return null;
