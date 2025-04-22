@@ -6334,20 +6334,35 @@ NSMutableArray<NSMutableDictionary*> * BuildOutlineTree(PTBookmark *item) {
 
 - (NSString *) getOutlineList {
     PTPDFDoc * doc = [self.currentDocumentViewController.pdfViewCtrl GetDoc];
-    PTBookmark *root = [doc GetFirstBookmark];
-    NSMutableArray<NSMutableDictionary*> *outline = BuildOutlineTree(root);
-
-    NSError *error;
-    NSData *jsonData = [NSJSONSerialization dataWithJSONObject:outline
-                                                       options:NSJSONWritingPrettyPrinted
-                                                         error:&error];
-    if (!jsonData) {
+    NSMutableArray<NSMutableDictionary*> *outline = [[NSMutableArray alloc] init];
+  
+    BOOL shouldUnlock = NO;
+    @try {
+      [doc LockRead];
+      shouldUnlock = YES;
+      
+      PTBookmark *root = [doc GetFirstBookmark];
+      outline = BuildOutlineTree(root);
+      
+      NSError *error;
+      NSData *jsonData = [NSJSONSerialization dataWithJSONObject:outline
+                                                         options:NSJSONWritingPrettyPrinted
+                                                           error:&error];
+      if (!jsonData) {
         NSLog(@"Error creating JSON data: %@", error);
+      }
+      
+      NSString *jsonString = [[NSString alloc] initWithData:jsonData encoding:NSUTF8StringEncoding];
+      NSLog(@"%@", jsonString);
+      
+    } @catch (NSException *exception) {
+      NSLog(@"Exception: %@: %@", exception.name, exception.reason);
+    } @finally {
+      if (shouldUnlock) {
+        [doc UnlockRead];
+      }
     }
-
-    NSString *jsonString = [[NSString alloc] initWithData:jsonData encoding:NSUTF8StringEncoding];
-    NSLog(@"%@", jsonString);
-
+  
     return outline;
 }
 
