@@ -3209,6 +3209,12 @@ NS_ASSUME_NONNULL_END
     [documentViewController showAddPagesViewFromScreenRect:screenRect];
 }
 
+- (void)exportIdenticalCopySelected
+{
+  PTDocumentBaseViewController *documentViewController = self.currentDocumentViewController;
+  [documentViewController exportIdenticalCopySelected];
+}
+
 - (void)shareCopyfromRect:(NSDictionary *)rect withFlattening:(BOOL)flattening
 {
     PTDocumentBaseViewController *documentViewController = self.currentDocumentViewController;

@@ -964,8 +964,14 @@ RCT_REMAP_METHOD(shareCopy,
                  rejector:(RCTPromiseRejectBlock)reject)
 {
     @try {
-        [[self documentViewManager] shareCopyForDocumentViewTag:tag rect:rect withFlattening:flattening];
-        resolve(nil);
+        if (flattening) {
+            [[self documentViewManager] shareCopyForDocumentViewTag:tag rect:rect withFlattening:flattening];
+            resolve(nil);
+        } else {
+            [[self documentViewManager] shareCopyForDocumentViewTag:tag rect:rect withFlattening:flattening];
+            [[self documentViewManager] exportIdenticalCopySelected:tag];
+            resolve(nil);
+        }
     }
     @catch (NSException *exception) {
         reject(@"share_copy", @"Failed to share a copy", [self errorFromException:exception]);

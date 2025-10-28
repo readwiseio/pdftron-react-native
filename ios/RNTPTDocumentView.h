@@ -733,6 +733,8 @@ static NSString * const PTSignaturesManager_signatureDirectory = @"PTSignaturesM
 
 - (void)showAddPagesViewFromRect:(NSDictionary *)rect;
 
+- (void)exportIdenticalCopySelected;
+
 - (void)shareCopyfromRect:(NSDictionary *)rect withFlattening:(BOOL)flattening;
 
 - (void)openThumbnailsView;

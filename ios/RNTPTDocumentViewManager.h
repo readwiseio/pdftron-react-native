@@ -191,6 +191,8 @@
 
 - (void)showAddPagesViewForDocumentViewTag:(nonnull NSNumber *)tag rect:(NSDictionary *)rect;
 
+- (void)exportIdenticalCopySelected:(nonnull NSNumber *)tag;
+
 - (void)shareCopyForDocumentViewTag:(nonnull NSNumber *)tag rect:(NSDictionary *)rect withFlattening:(BOOL)flattening;
 
 - (void)openThumbnailsViewForDocumentViewTag:(NSNumber *)tag;

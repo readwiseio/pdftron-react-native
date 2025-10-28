@@ -1598,6 +1598,12 @@ RCT_CUSTOM_VIEW_PROPERTY(signatureColors, NSArray, RNTPTDocumentView)
     }
 }
 
+- (void)exportIdenticalCopySelected:(NSNumber *)tag
+{
+  RNTPTDocumentView *documentView = self.documentViews[tag];
+  [documentView exportIdenticalCopySelected];
+}
+
 - (void)shareCopyForDocumentViewTag:(NSNumber *)tag rect:(NSDictionary *)rect withFlattening:(BOOL)flattening
 {
     RNTPTDocumentView *documentView = self.documentViews[tag];
