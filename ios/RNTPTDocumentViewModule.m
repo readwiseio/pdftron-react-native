@@ -969,6 +969,8 @@ RCT_REMAP_METHOD(shareCopy,
             resolve(nil);
         } else {
             [[self documentViewManager] shareCopyForDocumentViewTag:tag rect:rect withFlattening:flattening];
+            // Prevents crash on iPad/iOS26
+            [NSThread sleepForTimeInterval:1];
             [[self documentViewManager] exportIdenticalCopySelected:tag];
             resolve(nil);
         }
