@@ -1139,10 +1139,10 @@ NS_ASSUME_NONNULL_END
     }
     else if ( [toolMode isEqualToString:PTAnnotationCreateFreeTextDateToolKey]) {
         toolClass = [PTDateTextCreate class];
-    } 
+    }
     else if ( [toolMode isEqualToString:PTAnnotationCreateCheckMarkStampKey] ) {
         toolClass = [PTCheckMarkStampCreate class];
-    } 
+    }
     else if ( [toolMode isEqualToString:PTAnnotationCreateCrossMarkStampKey] ) {
         toolClass = [PTCrossMarkStampCreate class];
     }
@@ -1368,12 +1368,12 @@ NS_ASSUME_NONNULL_END
     if (hasDownloader || error) {
         return nil;
     }
-    
+
     if (self.collaborationManager != nil) {
         [self.collaborationManager importAnnotationsWithXFDFString:xfdfString];
         return [self getAnnotationFromXFDF:xfdfString];
     }
-    
+
     [pdfViewCtrl DocLock:YES withBlock:^(PTPDFDoc * _Nullable doc) {
         PTFDFDoc *fdfDoc = [PTFDFDoc CreateFromXFDF:xfdfString];
         if (replace) {
@@ -1383,7 +1383,7 @@ NS_ASSUME_NONNULL_END
         }
         [pdfViewCtrl Update:YES];
     } error:&error];
-    
+
     if (error) {
         NSLog(@"Error: There was an error while trying to import annotations. %@", error.localizedDescription);
         return nil;
@@ -5316,9 +5316,11 @@ NS_ASSUME_NONNULL_END
     if (pdfViewCtrl) {
         pdfViewCtrl.contentScrollView.showsHorizontalScrollIndicator = !hideScrollbars;
         pdfViewCtrl.contentScrollView.showsVerticalScrollIndicator = !hideScrollbars;
+        pdfViewCtrl.contentScrollView.scrollsToTop = NO;
 
         pdfViewCtrl.pagingScrollView.showsHorizontalScrollIndicator = !hideScrollbars;
         pdfViewCtrl.pagingScrollView.showsVerticalScrollIndicator = !hideScrollbars;
+        pdfViewCtrl.pagingScrollView.scrollsToTop = NO;
     }
 }
 
@@ -5941,7 +5943,7 @@ NS_ASSUME_NONNULL_END
     else if ( [key isEqualToString:PTAnnotationCreateDotStampKey] ) {
         return [PTDotStampCreate class];
     }
-    
+
     if (@available(iOS 13.1, *)) {
         if ([key isEqualToString:PTPencilKitDrawingToolKey]) {
             return [PTPencilDrawingCreate class];
@@ -6082,7 +6084,7 @@ NS_ASSUME_NONNULL_END
     else if (toolClass == [PTDotStampCreate class]) {
         return PTAnnotationCreateDotStampKey;
     }
-    
+
     if (@available(iOS 13.1, *)) {
         if (toolClass == [PTPencilDrawingCreate class]) {
             return PTPencilKitDrawingToolKey;
@@ -6335,15 +6337,15 @@ NSMutableArray<NSMutableDictionary*> * BuildOutlineTree(PTBookmark *item) {
 - (NSString *) getOutlineList {
     PTPDFDoc * doc = [self.currentDocumentViewController.pdfViewCtrl GetDoc];
     NSMutableArray<NSMutableDictionary*> *outline = [[NSMutableArray alloc] init];
-  
+
     BOOL shouldUnlock = NO;
     @try {
       [doc LockRead];
       shouldUnlock = YES;
-      
+
       PTBookmark *root = [doc GetFirstBookmark];
       outline = BuildOutlineTree(root);
-      
+
       NSError *error;
       NSData *jsonData = [NSJSONSerialization dataWithJSONObject:outline
                                                          options:NSJSONWritingPrettyPrinted
@@ -6351,10 +6353,10 @@ NSMutableArray<NSMutableDictionary*> * BuildOutlineTree(PTBookmark *item) {
       if (!jsonData) {
         NSLog(@"Error creating JSON data: %@", error);
       }
-      
+
       NSString *jsonString = [[NSString alloc] initWithData:jsonData encoding:NSUTF8StringEncoding];
       NSLog(@"%@", jsonString);
-      
+
     } @catch (NSException *exception) {
       NSLog(@"Exception: %@: %@", exception.name, exception.reason);
     } @finally {
@@ -6362,7 +6364,7 @@ NSMutableArray<NSMutableDictionary*> * BuildOutlineTree(PTBookmark *item) {
         [doc UnlockRead];
       }
     }
-  
+
     return outline;
 }
 
@@ -6452,7 +6454,7 @@ NSMutableArray<NSMutableDictionary*> * BuildOutlineTree(PTBookmark *item) {
     double orig_y1 = [original_bbox GetY1];
     double orig_x2 = [original_bbox GetX2];
     double orig_y2 = [original_bbox GetY2];
-    
+
     double original_width = orig_x2 - orig_x1;
     double original_height = orig_y2 - orig_y1;
 
@@ -6466,14 +6468,14 @@ NSMutableArray<NSMutableDictionary*> * BuildOutlineTree(PTBookmark *item) {
     // Compute new image dimensions
     double new_width = image_width * aspectFitRatio;
     double new_height = image_height * aspectFitRatio;
-    
+
     // Initialize a new PTElementWriter, PTElementBuilder and new markup object
     PTElementWriter* writer = [[PTElementWriter alloc] init];
     PTElementBuilder* builder = [[PTElementBuilder alloc] init];
     PTMarkup *markupAnnot = [[PTMarkup alloc] initWithAnn:annot];
 
     [writer WriterBeginWithSDFDoc:[doc GetSDFDoc] compress:YES];
-    
+
     // Initialize a new image element
     PTElement* img_element = [builder CreateImageWithCornerAndScale:image x:0 y:0 hscale:image_width vscale:image_height];
 
@@ -6485,10 +6487,10 @@ NSMutableArray<NSMutableDictionary*> * BuildOutlineTree(PTBookmark *item) {
 
     // Configure the appearance stream that will be written to the annotation
     PTObj* appearance_stream = [writer End];
-    
+
     // Set the bounding box to be the rect of the new element
     [appearance_stream PutRect:@"BBox" x1:[bbox GetX1] y1:[bbox GetY1] x2:[bbox GetX2] y2:[bbox GetY2]];
-        
+
     // Overwrite the annotation's appearance with the new appearance stream
     [annot SetAppearance:appearance_stream annot_state:e_ptnormal app_state:0];
 
@@ -6500,10 +6502,10 @@ NSMutableArray<NSMutableDictionary*> * BuildOutlineTree(PTBookmark *item) {
 
     // Apply the computed annotation rect
     [annot SetRect:new_annot_rect];
-    
+
     // Rotate the new appearance
     [markupAnnot RotateAppearance:[[[annot GetSDFObj] FindObj:@"Rotate"] GetNumber]];
-    
+
     // Apply original bbox to maintain size
     [annot SetRect:original_bbox];
 
